@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Infrastructure and Cloud Services Assistant</title>
+    <style>
+        :root {
+            --bg: #e0f2fe;
+            --panel: #f0f9ff;
+            --panel-soft: #ffffff;
+            --text: #0f172a;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-light: #7dd3fc;
+            --border: #7dd3fc;
+            --shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(140deg, #bae6fd 0%, #e0f2fe 45%, #bfdbfe 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: min(100%, 900px);
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(90deg, #0f172a, #1e293b);
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.35rem, 2.5vw, 2rem);
+            color: #f8fafc;
+            letter-spacing: 0.02em;
+        }
+
+        .intro,
+        .controls,
+        #chatBot {
+            padding: 1rem 1.25rem;
+        }
+
+        .intro {
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .controls {
+            display: grid;
+            gap: 0.75rem;
+            grid-template-columns: 1fr auto;
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        #userInput {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.78rem 0.8rem;
+            background: #ffffff;
+            color: var(--text);
+            outline: none;
+            font-size: 1rem;
+        }
+
+        #userInput:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+        }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: #0f172a;
+            font-weight: 700;
+            padding: 0.78rem 1.1rem;
+            cursor: pointer;
+            transition: transform 0.14s ease, box-shadow 0.14s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #chatBot {
+            min-height: 250px;
+            max-height: 60vh;
+            overflow-y: auto;
+            background: #e0f2fe;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        #chatBot p {
+            margin: 0;
+            line-height: 1.5;
+            padding: 0.65rem 0.8rem;
+            border-radius: 10px;
+            background: rgba(148, 163, 184, 0.12);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+
+        #chatBot p strong {
+            color: #e2e8f0;
+        }
+
+        #chatBot p:first-of-type {
+            margin-top: 0;
+        }
+
+        .message-you {
+            align-self: flex-end;
+            background: rgba(56, 189, 248, 0.18);
+            border-color: rgba(56, 189, 248, 0.35);
+        }
+
+        .message-bot {
+            align-self: flex-start;
+            background: rgba(148, 163, 184, 0.15);
+            border-color: rgba(148, 163, 184, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cloud Infrastructure and Cloud Services Assistant</h1>
+        </header>
+        <div class="intro">Welcome to the Cloud Infrastructure and Cloud Services Assistant. Ask a clear question and get guidance on cloud architecture, deployment, security, cost optimization, scalability, and best practices.</div>
+        <div class="controls">
+            <input type="text" id="userInput" placeholder="Enter your question about cloud infrastructure and services...">
+            <button id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+        <div id="chatBot" aria-live="polite" aria-label="Chat conversation"></div>
+    </div>
+    <script>
+        async function sendMessage() {
+            const inputEl = document.getElementById("userInput");
+            const message = inputEl.value.trim();
+            if (!message) return;
+            const chatEl = document.getElementById("chatBot");
+
+            const youMsg = document.createElement("p");
+            youMsg.classList.add("message-you");
+            youMsg.innerHTML = `<strong>You:</strong> ${message}`;
+            chatEl.appendChild(youMsg);
+            chatEl.scrollTop = chatEl.scrollHeight;
+
+            inputEl.value = "";
+            inputEl.disabled = true;
+            document.getElementById("sendBtn").disabled = true;
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message })
+                });
+                const data = await response.json();
+
+                const botMsg = document.createElement("p");
+                botMsg.classList.add("message-bot");
+                botMsg.innerHTML = `<strong>Bot:</strong> ${data.reply}`;
+                chatEl.appendChild(botMsg);
+                chatEl.scrollTop = chatEl.scrollHeight;
+            } catch (err) {
+                const errMsg = document.createElement("p");
+                errMsg.classList.add("message-bot");
+                errMsg.innerHTML = `<strong>Bot:</strong> Error connecting to server. Please try again.`;
+                chatEl.appendChild(errMsg);
+                chatEl.scrollTop = chatEl.scrollHeight;
+            } finally {
+                inputEl.disabled = false;
+                document.getElementById("sendBtn").disabled = false;
+                inputEl.focus();
+            }
+        }
+
+        document.getElementById("userInput").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendMessage();
+            }
+            window.onload = function() {
+    appendMessage(
+        "Hello! I am your Cloud Infrastructure and Cloud Services Assistant. Ask me anything about cloud computing, AWS, Azure, GCP, storage, security, or deployment!",
+        "bot"
+    );
+};
+        });
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from groq import Groq
 
 app = Flask(__name__)
+GROQ_API_KEY = "your_groq_api_key_here"
 
 client = Groq(api_key=GROQ_API_KEY)
 with open("knowledge.txt", "r", encoding="utf-8") as f:

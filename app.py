@@ -1,11 +1,7 @@
-import os
 from flask import Flask, request, jsonify, render_template
 from groq import Groq
-from dotenv import load_dotenv
 
-load_dotenv()
 app = Flask(__name__)
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 client = Groq(api_key=GROQ_API_KEY)
 with open("knowledge.txt", "r", encoding="utf-8") as f:
